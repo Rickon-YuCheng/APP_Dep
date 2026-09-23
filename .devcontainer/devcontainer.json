@@ -1,0 +1,41 @@
+{
+  "name": "Depression App Dev",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu-22.04",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "20" },
+    "ghcr.io/devcontainers/features/python:1": { "version": "3.11" },
+    "ghcr.io/jsburckhardt/devcontainer-features/uv:1": {}
+  },
+
+  "workspaceFolder": "/workspace",
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind"
+  ],
+
+  "forwardPorts": [8081, 19000, 19001, 19002],
+  "appPort": [8081, 19000, 19001, 19002],
+  "portsAttributes": {
+    "8081": { "label": "Expo Metro" },
+    "19000": { "label": "Expo (legacy manifest)" },
+    "19001": { "label": "Expo (legacy)" },
+    "19002": { "label": "Expo Dev Tools" }
+  },
+
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y git curl wget tree &&if [ -f /workspace/backend/pyproject.toml ]; then cd /workspace/backend && uv sync; fi",
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.vscode-typescript-next"
+      ]
+    }
+  }
+}
