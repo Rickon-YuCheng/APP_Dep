@@ -1,0 +1,8 @@
+# 個人的 Claude Code 權限設定
+.claude/settings.local.json
+
+# 依賴 / 環境
+node_modules/
+.venv/
+__pycache__/
+.env
