@@ -33,7 +33,8 @@ depression-app/
   - `App.tsx` → `src/DoctorScreen.tsx`(主畫面)、`src/ResultModal.tsx`(結果彈窗)、`src/analyze.ts`(API 呼叫/本地模擬)、`src/theme.ts`(配色)
   - 圖檔從 mockup bundle 抽出放在 `assets/images/`
   - 後端網址:在 `frontend/app/.env` 設 `EXPO_PUBLIC_API_ENDPOINT=...` 即走真實推論;未設定時延遲 1.6 秒後用身分證字號第一個字元的奇偶決定結果(同 mockup)
-  - 已驗證:`tsc --noEmit`、`expo-doctor` 21/21、`expo export --platform android` 可打包。**尚未在實機上跑過。**
+  - 已驗證:`tsc --noEmit`、`expo-doctor` 21/21、`expo export --platform android` 可打包,**iPhone Expo Go 經 Tailscale 實機跑成功**。
+  - Expo Go 連 Tailscale IP(非區網位址)時,手機 Expo Go 與 container 內 `npx expo login` 必須登入同一個 Expo 帳號,否則會被擋。登入資訊存在 `~/.expo/`,Rebuild Container 後要重登。
   - 注意:`create-expo-app` 自動在 `frontend/app/` 建了一個 `.git`(內含一個 Initial commit)。
 - `frontend/web/` — 空資料夾,之後的網頁版預留(future work)。
 - `backend/` — 還沒建立。
@@ -53,11 +54,15 @@ depression-app/
 - 助理/醫師網頁的角色分工細節(原規劃是助理上傳、醫師看報告,但 mockup 把這兩件事合在醫師一人身上)——使用者說這個之後再確認,現在不用管
 - **Expo + Tailscale 的坑**:用手機透過 Tailscale 連 container 裡跑的 Expo Metro 時,QR Code 內建的網址預設會抓 container 內部的 docker 網段 IP,不會自動變成 Tailscale IP,手機掃了會連不上。實際跑 `expo start` 時要加上環境變數手動指定:
   ```
-  EXPO_PACKAGER_HOSTNAME=<host 的 Tailscale IP> npx expo start
+  REACT_NATIVE_PACKAGER_HOSTNAME=<host 的 Tailscale IP> npx expo start
   ```
+  - 注意變數名稱是 `REACT_NATIVE_PACKAGER_HOSTNAME`;`EXPO_PACKAGER_HOSTNAME` 不會被讀(已查過 `@expo/cli` 原始碼),QR Code 會變成 `172.17.0.2`
+  - host 是 `leopold-altos-p30-f6`,Tailscale IP `100.91.82.45`
+  - 另一個坑:devcontainer 的 `appPort` 只會發佈到 host 的 `127.0.0.1`(`docker ps` 看到 `127.0.0.1:8081->8081`),手機連會 request timed out。已改成 `runArgs -p 0.0.0.0:...`,需要 Rebuild Container 才生效。host 的 ufw 是 inactive。
+  - 使用者的 iPhone(`iphone173`)Tailscale 金鑰曾過期(Expired Jun 18, 2026),連不上時先檢查這個
 
 ## 建議下一步
 
-1. 用手機 Expo Go 實機測試醫師端畫面(需要 host 的 Tailscale IP,見上方 Tailscale 注意事項;在 `frontend/app/` 執行)
+1. ~~用手機 Expo Go 實機測試醫師端畫面~~(已完成)
 2. 建立 FastAPI 後端,實作上述 API 合約後設定 `EXPO_PUBLIC_API_ENDPOINT` 串接
 3. Git 由使用者自己初始化(不要替使用者 `git init`)

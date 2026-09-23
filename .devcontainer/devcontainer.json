@@ -14,8 +14,13 @@
   ],
 
   "forwardPorts": [8081, 19000, 19001, 19002],
-  "appPort": [8081, 19000, 19001, 19002],
+  // appPort 只會綁在 host 的 127.0.0.1,手機走 Tailscale 連不進來,所以改用 runArgs 綁 0.0.0.0
+  "runArgs": [
+    "-p", "0.0.0.0:8081:8081",
+    "-p", "0.0.0.0:19000-19002:19000-19002"
+  ],
   "portsAttributes": {
+    "8000": { "label": "FastAPI backend" },
     "8081": { "label": "Expo Metro" },
     "19000": { "label": "Expo (legacy manifest)" },
     "19001": { "label": "Expo (legacy)" },
@@ -34,7 +39,8 @@
         "charliermarsh.ruff",
         "esbenp.prettier-vscode",
         "dbaeumer.vscode-eslint",
-        "ms-vscode.vscode-typescript-next"
+        "ms-vscode.vscode-typescript-next",
+        "anthropic.claude-code"
       ]
     }
   }
